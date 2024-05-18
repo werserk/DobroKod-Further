@@ -33,8 +33,6 @@ def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_
 
 
 TO_MAKE_TICKETS = ['вопрос онкологу','вопрос лимфологу', 'вопрос эндокринологу', 'вопрос диетологу',
-     'вопрос дерматологу', 'хочу поделиться своим опытом', 'хочу оставить отзыв',
-     'помочь по-другому']
+     'вопрос дерматологу']
 
-def make_ticket(chat_id, user_id):
-    pass
+

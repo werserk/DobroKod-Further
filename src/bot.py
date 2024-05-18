@@ -7,6 +7,7 @@ from handlers.recommendation import handle_recommendation
 from services.openai_service import get_openai_response
 from prompts.get_prompt import load_prompt
 from charity import Charity_Information, CHARITY_ANSWERS
+from tickets import TO_MAKE_TICKETS, add_patient_record
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
@@ -40,7 +41,6 @@ def generate_submenu(options):
     buttons.append(types.KeyboardButton('Назад'))
     submenu.add(*buttons)
     return submenu
-
 
 
 @bot.message_handler(func=lambda message: True)
@@ -109,9 +109,25 @@ def handle_message(message):
             with open(pdf_path, 'rb') as pdf_file:
                 bot.send_document(message.chat.id, pdf_file)
     elif text in TO_MAKE_TICKETS:
-        make_ticket(message.chat.id, message.from_user.id)
+        mesg = bot.reply_to(
+            message, "Пожалуйста, напишите запрос",
+            reply_markup=telebot.types.ForceReply(True, "Запрос"))
+        bot.register_next_step_handler(mesg, make_ticket)
+
     else:
         bot.send_message(message.chat.id, 'Извините, я не понимаю ваш запрос. Попробуйте задать другой вопрос.')
+
+def make_ticket(message):
+    file_path = '..\data/users.xlsx'
+    status = 'в работе'
+    name = message.from_user.id
+    email = '-'
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+    request = message.text
+    doctor = '-'
+    diagnosis = '-'
+    add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_id,request , doctor)
 
 def handle_message_custom(message):
     user_input = message.text
