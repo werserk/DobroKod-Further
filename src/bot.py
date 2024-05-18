@@ -108,6 +108,8 @@ def handle_message(message):
             pdf_path = CHARITY_ANSWERS[text].file
             with open(pdf_path, 'rb') as pdf_file:
                 bot.send_document(message.chat.id, pdf_file)
+    elif text in TO_MAKE_TICKETS:
+        make_ticket(message.chat.id, message.from_user.id)
     else:
         bot.send_message(message.chat.id, 'Извините, я не понимаю ваш запрос. Попробуйте задать другой вопрос.')
 

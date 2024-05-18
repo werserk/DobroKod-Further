@@ -8,23 +8,16 @@ class Charity_Information:
         return f"Information(type={self.info_type}, file={self.file}, name={self.name})"
 
 CHARITY_ANSWERS = {
-    'как сохранить здоровье груди': Charity_Information('..\document', 'data/Posobie_2021_33_page_WEB_020221 (2).pdf', None),
+    'как сохранить здоровье груди': Charity_Information('document', '..\data/Posobie_2021_33_page_WEB_020221 (2).pdf', None),
     'как узнать свой риск': Charity_Information('link', None, 'https://www.dalshefond.ru/check/'),
     'как рак груди лечится':Charity_Information('link', None, 'https://vmesteplus.ru/distance-programs/oncologist-course/'),
     'навигатор для пациента': Charity_Information('link', None, 'https://vmesteplus.ru/first-hand/articles/rak-grudi-putevoditel/'),
     'соедините меня с сотрудником фонда' : Charity_Information('link', None, 'почта info@dalshefond.ru, тел. 8-800-707-44-03'),
     'подозрение на рак' : Charity_Information('link', None, 'https://vmesteplus.ru/personal/personalized-help/oncologist/'),
 
-    #'Вопрос онкологу' ,
-    # 'Вопрос лимфологу',
-    # 'Вопрос эндокринологу',
-    # 'Вопрос диетологу',
-    # 'Вопрос дерматологу',
 
-    # 'Хочу поделиться своим опытом',
-    # 'Хочу оставить отзыв',
     # 'Оцените работу Фонда по шкале от 1 до 10',
-    # 'Помочь по-другому',
+
 
     # 'Как попасть к онкологу',
     # 'Где пройти обследования',
