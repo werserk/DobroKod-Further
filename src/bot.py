@@ -6,6 +6,7 @@ from handlers.questionnaire import handle_questionnaire
 from handlers.recommendation import handle_recommendation
 from services.openai_service import get_openai_response
 from prompts.get_prompt import load_prompt
+from charity import Charity_Information, CHARITY_ANSWERS
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
@@ -39,6 +40,7 @@ def generate_submenu(options):
     buttons.append(types.KeyboardButton('Назад'))
     submenu.add(*buttons)
     return submenu
+
 
 
 @bot.message_handler(func=lambda message: True)
@@ -99,6 +101,8 @@ def handle_message(message):
         else:
             bot.send_message(message.chat.id, f'Вы выбрали "{message.text}". Пожалуйста, выберите:',
                              reply_markup=response_markup)
+    elif text in CHARITY_ANSWERS:
+        bot.send_message(message.chat.id, 'Соединяем вас с сотрудником Фонда...')
     else:
         bot.send_message(message.chat.id, 'Извините, я не понимаю ваш запрос. Попробуйте задать другой вопрос.')
 
