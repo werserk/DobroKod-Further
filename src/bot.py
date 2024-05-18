@@ -74,7 +74,7 @@ def handle_message(message):
         ]),
         "как получить помощь фонда": generate_submenu([
             'Консультация психолога', 'Консультация онколога',
-            'Консультация медицинского юриста', 'Школа пациента',
+            'Консультация медицинского юриста',
             'Бесплатное такси к месту лечения', 'Другие вопросы',
             'Соедините меня с сотрудником Фонда', 'Скачать пособие для пациентов'
         ]),
@@ -86,7 +86,7 @@ def handle_message(message):
             'Хочу поделиться своим опытом', 'Написать руководителю',
             'Хочу оставить отзыв', 'Оцените работу Фонда по шкале от 1 до 10'
         ]),
-        "соедините меня с сотрудником фонда": ["Ожидание соединения"],
+
         "хочу помочь фонду": generate_submenu([
             'Юридическое лицо', 'Частное лицо',
             'Отправить ссылку другу или в соц. сети', 'Сделать пожертвование',
@@ -102,7 +102,12 @@ def handle_message(message):
             bot.send_message(message.chat.id, f'Вы выбрали "{message.text}". Пожалуйста, выберите:',
                              reply_markup=response_markup)
     elif text in CHARITY_ANSWERS:
-        bot.send_message(message.chat.id, 'Соединяем вас с сотрудником Фонда...')
+        if CHARITY_ANSWERS[text].info_type == 'link':
+            bot.send_message(message.chat.id, CHARITY_ANSWERS[text].name)
+        elif CHARITY_ANSWERS[text].info_type == 'document':
+            pdf_path = CHARITY_ANSWERS[text].file
+            with open(pdf_path, 'rb') as pdf_file:
+                bot.send_document(message.chat.id, pdf_file)
     else:
         bot.send_message(message.chat.id, 'Извините, я не понимаю ваш запрос. Попробуйте задать другой вопрос.')
 
