@@ -1,30 +1,12 @@
 import streamlit as st
 
-from data_loader import load_data, update_data
+from data_loader import load_data, update_data, filter_by_email, filter_by_doctor, filter_by_status
 from style_display import apply_styles, display_card
 
 
-def filter_by_email(df, search_query):
-    if search_query:
-        return df[df["Почта"].str.contains(search_query, case=False, na=False)]
-    return df
-
-
-def filter_by_status(df, status_filter):
-    if status_filter != "Все":
-        return df[df["Статус"] == status_filter]
-    return df
-
-
-def filter_by_doctor(df, doctor_filter):
-    if doctor_filter != "Все":
-        return df[df["Специалист"] == doctor_filter]
-    return df
-
-
 def main():
-    df = load_data()
     apply_styles()
+    df = load_data()
 
     st.sidebar.header("Фильтры")
     search_query = st.sidebar.text_input("Поиск по почте:")
@@ -46,7 +28,7 @@ def main():
             display_card(row, key=idx)
 
     # Обработчик события для изменения статуса
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params
     if "change_status" in query_params:
         key = int(query_params["change_status"][0])
         person = df.loc[key]
@@ -55,7 +37,7 @@ def main():
         else:
             df.loc[key, "Статус"] = "активный"
         update_data(df)
-        st.experimental_set_query_params()  # Очистить параметры
+        st.experimental_set_query_params()
         st.experimental_rerun()
 
 

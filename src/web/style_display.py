@@ -3,6 +3,7 @@ import streamlit as st
 
 # CSS и JavaScript для стилизации и обработки событий
 def apply_styles():
+    st.set_page_config(layout="wide")
     st.markdown(
         """
         <style>
