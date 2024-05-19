@@ -9,9 +9,13 @@ from dotenv import load_dotenv
 from telebot import types
 
 from src.bot.tickets import make_ticket
+from src.database.session import init_db
+from src.database.utils import add_user
 from src.processing.openai_service import get_ai_response
 
 load_dotenv()
+
+init_db()
 
 bot = telebot.TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
 
@@ -33,6 +37,11 @@ main_menu_keyboard.add(*buttons)
 def send_welcome(message: types.Message) -> None:
     bot.send_message(
         message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
+    )
+    add_user(
+        chat_id=message.chat.id,
+        user_id=message.from_user.id,
+        name=message.from_user.first_name,
     )
 
 
@@ -87,10 +96,13 @@ def handle_message(message: types.Message) -> None:
 
 
 def handle_ai_response(message: types.Message, ai_message: types.Message) -> None:
+    max_points_generated = 25
+    max_points_inline = 3
+
     dots = ""
-    for _ in range(20):
+    for _ in range(max_points_generated):
         dots += "."
-        if len(dots) > 3:
+        if len(dots) > max_points_inline:
             dots = ""
         bot.edit_message_text(
             chat_id=message.chat.id,
@@ -101,7 +113,6 @@ def handle_ai_response(message: types.Message, ai_message: types.Message) -> Non
 
 
 def process_question(message: types.Message) -> None:
-    user_question = message.text
     loading_message = bot.send_message(message.chat.id, "Ищем ответ")
 
     thread = threading.Thread(
@@ -109,7 +120,7 @@ def process_question(message: types.Message) -> None:
     )
     thread.start()
 
-    gpt_response = get_ai_response(user_question, message.chat.id)
+    gpt_response = get_ai_response(message)
 
     thread.join()
 
@@ -121,4 +132,5 @@ def process_question(message: types.Message) -> None:
 
 
 if __name__ == "__main__":
+    print("[*] Bot is active")
     bot.polling()
