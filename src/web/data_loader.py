@@ -1,7 +1,8 @@
 import pandas as pd
 import streamlit as st
-from src.database.utils import get_all_users, get_all_tickets
-from src.database.models import User, Ticket
+from ..database.utils import get_all_users, get_all_tickets
+from ..database.models import User, Ticket
+from ..database.session import SessionLocal
 
 
 @st.cache_resource
@@ -12,6 +13,7 @@ def filter_by_diagnosis(users: list[Ticket], search_query: str) -> list[Ticket]:
     return [user for user in users if search_query.lower() in (user.diagnosis or '').lower()]
 
 def doctor_list():
+    session = SessionLocal()
     unique_doctors = session.query(Ticket.expert).distinct().all()
     return [doctor[0] for doctor in unique_doctors if doctor[0]]
 

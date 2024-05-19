@@ -45,22 +45,16 @@ def apply_styles() -> None:
 
 
 # Функция для отображения данных в виде карточек
-def display_card(person: pd.Series) -> None:
-    duplicate_warning = (
-        "<div class='duplicate-warning'>Возможно дубликат</div>"
-        if person["Дублон ли"] == 1
-        else "<div></div>"
-    )
+def display_card(ticket) -> None:
+
     st.markdown(
         f"""
     <div class="card">
-        {duplicate_warning}
-        <h3 style="color: #2c3e50;">{person['Имя']}</h3>
-        <p style="color: #34495e;"><strong>Статус:</strong> {person['Статус']}</p>
-        <p style="color: #34495e;"><strong>Диагноз:</strong> {person['Диагноз']}</p>
-        <p style="color: #34495e;"><strong>Почта:</strong> {person['Почта']}</p>
-        <p style="color: #34495e;"><strong>Заявка:</strong> {person['Тема заявки']}</p>
-        <p style="color: #34495e;"><strong>Специалист:</strong> {person['Специалист']}</p>
+        <h3 style="color: #2c3e50;">{ticket['Имя']}</h3>
+        <p style="color: #34495e;"><strong>Статус:</strong> {ticket.status}</p>
+        <p style="color: #34495e;"><strong>Диагноз:</strong> {ticket.diagnosis}</p>
+        <p style="color: #34495e;"><strong>Заявка:</strong> {ticket.request_body}</p>
+        <p style="color: #34495e;"><strong>Специалист:</strong> {ticket.expert}</p>
     </div>
     """,
         unsafe_allow_html=True,
