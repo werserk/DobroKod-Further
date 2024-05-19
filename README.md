@@ -4,6 +4,8 @@
 docker-compose up --build
 ```
 
+Для корректной работы OpenAI API нужен VPN!
+
 ## Additional materials
 
 - [Presentation](https://docs.google.com/presentation/d/1BcdFLT8iI9ciLSWO5948rsZ-FlPaijCCQg2Iu0VgUCg/edit?usp=sharing)
