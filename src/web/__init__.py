@@ -1,13 +1,12 @@
-import os
-
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
-data_path = 'src/web/table.xlsx'
-df = pd.read_excel('src/web/table.xlsx')
+data_path = "src/web/table.xlsx"
+df = pd.read_excel("src/web/table.xlsx")
 
 # CSS и JavaScript для стилизации и обработки событий
-st.markdown("""
+st.markdown(
+    """
     <style>
     .card {
         border: 1px solid #e6e6e6; 
@@ -40,12 +39,20 @@ st.markdown("""
         window.location.search = params.toString();
     }
     </script>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 
 # Функция для отображения данных в виде карточек
 def display_card(person, key):
-    duplicate_warning = "<div class='duplicate-warning'>Возможно дубликат</div>" if person['Дублон ли'] == 1 else "<div></div>"
-    st.markdown(f"""
+    duplicate_warning = (
+        "<div class='duplicate-warning'>Возможно дубликат</div>"
+        if person["Дублон ли"] == 1
+        else "<div></div>"
+    )
+    st.markdown(
+        f"""
     <div class="card">
         {duplicate_warning}
         <button class="checkmark" onclick="changeStatus('{key}')">
@@ -60,24 +67,31 @@ def display_card(person, key):
         <p style="color: #34495e;"><strong>Заявка:</strong> {person['Тема заявки']}</p>
         <p style="color: #34495e;"><strong>Специалист:</strong> {person['Специалист']}</p>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
+
 
 def main():
     # Меню с поисковой строкой и фильтрами
     st.sidebar.header("Фильтры")
     search_query = st.sidebar.text_input("Поиск по почте:")
     status_filter = st.sidebar.selectbox("Статус:", ["Все", "активный", "неактивный"])
-    doctor_filter = st.sidebar.selectbox("Специалист:", ["Все"] + list(df['Специалист'].unique()))
+    doctor_filter = st.sidebar.selectbox(
+        "Специалист:", ["Все"] + list(df["Специалист"].unique())
+    )
 
     # Фильтрация данных
     filtered_df = df[
-        (df['Почта'].str.contains(search_query, case=False, na=False)) &
-        ((df['Статус'] == status_filter) if status_filter != "Все" else True) &
-        ((df['Специалист'] == doctor_filter) if doctor_filter != "Все" else True)
+        (df["Почта"].str.contains(search_query, case=False, na=False))
+        & ((df["Статус"] == status_filter) if status_filter != "Все" else True)
+        & ((df["Специалист"] == doctor_filter) if doctor_filter != "Все" else True)
         ]
 
     # Вывод данных
-    st.markdown("<h1 style='text-align: center;'>Хуи и пёзды</h1>", unsafe_allow_html=True)
+    st.markdown(
+        "<h1 style='text-align: center;'>Хуи и пёзды</h1>", unsafe_allow_html=True
+    )
     cols = st.columns(3)
     for idx, row in filtered_df.iterrows():
         with cols[idx % 3]:
@@ -85,16 +99,17 @@ def main():
 
     # Обработчик события для изменения статуса
     query_params = st.experimental_get_query_params()
-    if 'change_status' in query_params:
-        key = int(query_params['change_status'][0])
+    if "change_status" in query_params:
+        key = int(query_params["change_status"][0])
         person = df.loc[key]
-        if person['Статус'] == "активный":
-            df.loc[key, 'Статус'] = "неактивный"
+        if person["Статус"] == "активный":
+            df.loc[key, "Статус"] = "неактивный"
         else:
-            df.loc[key, 'Статус'] = "активный"
+            df.loc[key, "Статус"] = "активный"
         df.to_excel(data_path, index=False)
         st.experimental_set_query_params()  # Очистить параметры
         st.experimental_rerun()
+
 
 if __name__ == "__main__":
     main()

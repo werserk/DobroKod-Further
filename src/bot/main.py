@@ -1,19 +1,21 @@
-import telebot
-from telebot import types
-from src.processing.openai_service import get_ai_response
-import time
 import json
-import threading
-from src.bot.tickets import make_ticket
-from dotenv import load_dotenv
 import os
+import threading
+import time
+
+import telebot
+from dotenv import load_dotenv
+from telebot import types
+
+from src.bot.tickets import make_ticket
+from src.processing.openai_service import get_ai_response
 
 load_dotenv()
 
 bot = telebot.TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
 
 # Загрузка данных из JSON
-with open("../bot/buttons_data.json", "r", encoding="utf-8") as file:
+with open("../../data/buttons_data.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 main_menu_buttons = data["main_menu_buttons"]
