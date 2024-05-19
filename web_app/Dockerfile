@@ -6,7 +6,6 @@ WORKDIR /app
 
 COPY web_app/src/web /app/web
 COPY common_api/src/my_api /app/common_api
-COPY common_api/src/processing /app/processing
 COPY ./data /app/data
 COPY pyproject.toml poetry.lock /app/
 

@@ -8,7 +8,6 @@ RUN pip install --no-cache-dir poetry
 
 # Копируем файлы проекта
 COPY common_api/src/my_api /app/my_api
-COPY common_api/src/processing /app/processing
 COPY pyproject.toml poetry.lock /app/
 
 RUN apt-get update && \
