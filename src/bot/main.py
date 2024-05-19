@@ -72,7 +72,7 @@ def handle_message(message: types.Message) -> None:
         add_ticket(
             message.from_user.id, USER_DATA[message.from_user.id].diagnosis,
             USER_DATA[message.from_user.id].doctor,
-            'новая заявка', '', USER_DATA[message.from_user.id].request
+            'активный', '', USER_DATA[message.from_user.id].request
         )
         bot.send_message(message.chat.id, 'Спасибо за заявку, она принята и находится в работе')
         return

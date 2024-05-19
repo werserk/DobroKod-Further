@@ -1,9 +1,8 @@
 import streamlit as st
 
 from data_loader import (
-    load_data,
-    update_data,
-    filter_by_email,
+    load_ticket,
+    filter_by_diagnosis,
     filter_by_doctor,
     filter_by_status,
 )
@@ -12,18 +11,18 @@ from style_display import apply_styles, display_card
 
 def main():
     apply_styles()
-    df = load_data()
-
+    tickets = load_ticket()
     st.sidebar.header("Фильтры")
-    search_query = st.sidebar.text_input("Поиск по почте:")
+    search_query = st.sidebar.text_input("Поиск по диагнозу:")
     status_filter = st.sidebar.selectbox("Статус:", ["Все", "активный", "неактивный"])
+
     doctor_filter = st.sidebar.selectbox(
         "Специалист:", ["Все"] + list(df["Специалист"].unique())
     )
 
     # Фильтрация данных
-    filtered_df = filter_by_email(df, search_query)
-    filtered_df = filter_by_status(filtered_df, status_filter)
+    filtered_df = filter_by_email(load_user, search_query)
+    filtered_df = filter_by_status(load_ticket, status_filter)
     filtered_df = filter_by_doctor(filtered_df, doctor_filter)
 
     # Вывод данных
