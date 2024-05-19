@@ -4,7 +4,7 @@ from openpyxl.utils import get_column_letter
 
 
 def add_patient_record(
-        file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor
+    file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor
 ):
     try:
         # Попробуем открыть существующую книгу
