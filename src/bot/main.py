@@ -2,6 +2,7 @@ import json
 import os
 import threading
 import time
+from typing import List
 
 import telebot
 from dotenv import load_dotenv
@@ -29,13 +30,13 @@ main_menu_keyboard.add(*buttons)
 
 
 @bot.message_handler(commands=["start"])
-def send_welcome(message):
+def send_welcome(message: types.Message) -> None:
     bot.send_message(
         message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
     )
 
 
-def generate_submenu(options):
+def generate_submenu(options: List[str]) -> types.ReplyKeyboardMarkup:
     submenu = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     buttons = [types.KeyboardButton(option) for option in options]
     buttons.append(types.KeyboardButton("Назад"))
@@ -44,7 +45,7 @@ def generate_submenu(options):
 
 
 @bot.message_handler(func=lambda message: True)
-def handle_message(message):
+def handle_message(message: types.Message) -> None:
     text = message.text.lower()
 
     if text == "назад":
@@ -85,7 +86,7 @@ def handle_message(message):
         process_question(message)
 
 
-def handle_ai_response(message, ai_message):
+def handle_ai_response(message: types.Message, ai_message: types.Message) -> None:
     dots = ""
     for _ in range(20):
         dots += "."
@@ -99,7 +100,7 @@ def handle_ai_response(message, ai_message):
         time.sleep(0.5)
 
 
-def process_question(message):
+def process_question(message: types.Message) -> None:
     user_question = message.text
     loading_message = bot.send_message(message.chat.id, "Ищем ответ")
 

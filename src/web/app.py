@@ -1,6 +1,12 @@
 import streamlit as st
 
-from data_loader import load_data, update_data, filter_by_email, filter_by_doctor, filter_by_status
+from data_loader import (
+    load_data,
+    update_data,
+    filter_by_email,
+    filter_by_doctor,
+    filter_by_status,
+)
 from style_display import apply_styles, display_card
 
 

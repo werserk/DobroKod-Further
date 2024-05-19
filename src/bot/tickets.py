@@ -5,23 +5,35 @@ import pandas as pd
 DATA_PATH = "src/web/table.xlsx"
 
 
-def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor):
+def add_patient_record(
+        file_path: str,
+        status: str,
+        diagnosis: str,
+        name: str,
+        email: str,
+        chat_id: int,
+        user_id: int,
+        request: str,
+        doctor: str,
+):
     # Проверим, существует ли файл
     if os.path.exists(file_path):
         # Загрузим существующие данные
         df = pd.read_excel(file_path)
     else:
         # Создадим новый DataFrame с заголовками
-        df = pd.DataFrame(columns=[
-            "Статус",
-            "Диагноз",
-            "Имя",
-            "Почта",
-            "chat_id",
-            "user_id",
-            "Заявка",
-            "Врач",
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "Статус",
+                "Диагноз",
+                "Имя",
+                "Почта",
+                "chat_id",
+                "user_id",
+                "Заявка",
+                "Врач",
+            ]
+        )
 
     # Создадим новую запись
     new_record = {
@@ -32,7 +44,7 @@ def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_
         "chat_id": chat_id,
         "user_id": user_id,
         "Заявка": request,
-        "Врач": doctor
+        "Врач": doctor,
     }
 
     # Добавим новую запись в DataFrame

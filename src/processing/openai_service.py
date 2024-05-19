@@ -10,7 +10,7 @@ chats = {}  # TODO: change to DB
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-def get_ai_response(message: str, chat_id: str):
+def get_ai_response(message: str, chat_id: int) -> str:
     if chat_id not in chats:
         thread = client.beta.threads.create()
         chats[chat_id] = thread.id

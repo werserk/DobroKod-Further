@@ -1,8 +1,9 @@
+import pandas as pd
 import streamlit as st
 
 
 # CSS и JavaScript для стилизации и обработки событий
-def apply_styles():
+def apply_styles() -> None:
     st.set_page_config(layout="wide")
     st.markdown(
         """
@@ -44,7 +45,7 @@ def apply_styles():
 
 
 # Функция для отображения данных в виде карточек
-def display_card(person, key):
+def display_card(person: pd.Series, key: int) -> None:
     duplicate_warning = (
         "<div class='duplicate-warning'>Возможно дубликат</div>"
         if person["Дублон ли"] == 1
