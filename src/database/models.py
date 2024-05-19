@@ -32,5 +32,4 @@ class Ticket(Base):
     expert = Column(String)
     is_duplicate = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-
     user = relationship("User", back_populates="tickets")

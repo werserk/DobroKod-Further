@@ -28,14 +28,17 @@ def add_user(
 
 
 def add_ticket(
-        user_id: int, status: str, request_subject: str, request_body: str
+        user_id: int, diagnosis: str, doctor: str, status: str, request_subject: str, request_body: str
 ) -> None:
     session = SessionLocal()
     ticket = Ticket(
         user_id=user_id,
+        diagnosis=diagnosis,
+        expert=doctor,
         status=status,
         request_subject=request_subject,
         request_body=request_body,
+        is_duplicate=0,
     )
     session.add(ticket)
     session.commit()
