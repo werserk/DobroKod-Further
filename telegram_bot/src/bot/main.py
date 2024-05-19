@@ -2,17 +2,11 @@ import json
 import os
 import threading
 import time
-from typing import List
 
 import requests
 import telebot
 from dotenv import load_dotenv
 from telebot import types
-
-from src.bot.tickets import Ticket
-from src.database.session import init_db
-from src.database.utils import add_user, add_ticket
-from src.processing.openai_service import get_ai_response
 
 load_dotenv()
 
@@ -34,14 +28,20 @@ main_menu_keyboard.add(*buttons)
 
 USER_DATA = {}
 
+
 @bot.message_handler(commands=["start"])
 def send_welcome(message: types.Message) -> None:
-    bot.send_message(message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard)
-    response = requests.post(f"{API_URL}/add_user", json={
-        "chat_id": message.chat.id,
-        "user_id": message.from_user.id,
-        "name": message.from_user.first_name
-    })
+    bot.send_message(
+        message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
+    )
+    response = requests.post(
+        f"{API_URL}/add_user",
+        json={
+            "chat_id": message.chat.id,
+            "user_id": message.from_user.id,
+            "name": message.from_user.first_name,
+        },
+    )
     user_id = response.json().get("user_id")
 
 
@@ -59,73 +59,99 @@ def handle_message(message: types.Message) -> None:
     text = message.text.lower()
 
     if text == "назад":
-        bot.send_message(message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard)
+        bot.send_message(
+            message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
+        )
         return
-    if message.from_user.id in USER_DATA and USER_DATA[message.from_user.id].flag == True and USER_DATA[message.from_user.id].status == 'заполнено':
+    if (
+            message.from_user.id in USER_DATA
+            and USER_DATA[message.from_user.id].flag == True
+            and USER_DATA[message.from_user.id].status == "заполнено"
+    ):
         USER_DATA[message.from_user.id].request = message.text
         USER_DATA[message.from_user.id].flag = False
-        USER_DATA[message.from_user.id].status = 'работаем'
-        add_ticket(
-            message.from_user.id, USER_DATA[message.from_user.id].diagnosis,
-            USER_DATA[message.from_user.id].doctor,
-            'активный', '', USER_DATA[message.from_user.id].request
+        USER_DATA[message.from_user.id].status = "работаем"
+        response = requests.post(
+            f"{API_URL}/add_ticket",
+            json={
+                "user_id": message.from_user.id,
+                "diagnosis": USER_DATA[message.from_user.id].diagnosis,
+                "doctor": USER_DATA[message.from_user.id].doctor,
+                "status": "активный",
+                "request_subject": "",
+                "request_body": USER_DATA[message.from_user.id].request,
+            },
         )
-        bot.send_message(message.chat.id, 'Спасибо за заявку, она принята и находится в работе')
+        if response.status_code == 200:
+            bot.send_message(
+                message.chat.id, "Спасибо за заявку, она принята и находится в работе"
+            )
         return
 
-    if message.from_user.id in USER_DATA and USER_DATA[message.from_user.id].flag == True and USER_DATA[message.from_user.id].status == 'сбор данных':
-        if  USER_DATA[message.from_user.id].name == None:
+    if (
+            message.from_user.id in USER_DATA
+            and USER_DATA[message.from_user.id].flag == True
+            and USER_DATA[message.from_user.id].status == "сбор данных"
+    ):
+        if USER_DATA[message.from_user.id].name is None:
             USER_DATA[message.from_user.id].name = message.text
-            if USER_DATA[message.from_user.id].email == None:
-                bot.send_message(message.chat.id, 'Напишите свой email')
-            elif USER_DATA[message.from_user.id].diagnosis == None:
-                bot.send_message(message.chat.id, 'Напишите свой диагноз или слово нет, при отсутствии')
-            elif USER_DATA[message.from_user.id].doctor == None:
-                bot.send_message(message.chat.id, 'Напишите, кому адрессован вопрос')
+            if USER_DATA[message.from_user.id].email is None:
+                bot.send_message(message.chat.id, "Напишите свой email")
+            elif USER_DATA[message.from_user.id].diagnosis is None:
+                bot.send_message(
+                    message.chat.id,
+                    "Напишите свой диагноз или слово нет, при отсутствии",
+                )
+            elif USER_DATA[message.from_user.id].doctor is None:
+                bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
             else:
-                USER_DATA[message.from_user.id].status = 'заполнено'
-                bot.send_message(message.chat.id, 'Напишите свой вопрос')
-        elif USER_DATA[message.from_user.id].email == None:
+                USER_DATA[message.from_user.id].status = "заполнено"
+                bot.send_message(message.chat.id, "Напишите свой вопрос")
+        elif USER_DATA[message.from_user.id].email is None:
             USER_DATA[message.from_user.id].email = message.text
-            if USER_DATA[message.from_user.id].diagnosis == None:
-                bot.send_message(message.chat.id, 'Напишите свой диагноз или слово нет, при отсутствии')
-            elif USER_DATA[message.from_user.id].doctor == None:
-                bot.send_message(message.chat.id, 'Напишите, кому адрессован вопрос')
+            if USER_DATA[message.from_user.id].diagnosis is None:
+                bot.send_message(
+                    message.chat.id,
+                    "Напишите свой диагноз или слово нет, при отсутствии",
+                )
+            elif USER_DATA[message.from_user.id].doctor is None:
+                bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
             else:
-                USER_DATA[message.from_user.id].status = 'заполнено'
-                bot.send_message(message.chat.id, 'Напишите свой вопрос')
-        elif USER_DATA[message.from_user.id].diagnosis == None:
+                USER_DATA[message.from_user.id].status = "заполнено"
+                bot.send_message(message.chat.id, "Напишите свой вопрос")
+        elif USER_DATA[message.from_user.id].diagnosis is None:
             USER_DATA[message.from_user.id].diagnosis = message.text
-            if USER_DATA[message.from_user.id].doctor == None:
-                bot.send_message(message.chat.id, 'Напишите, кому адрессован вопрос')
+            if USER_DATA[message.from_user.id].doctor is None:
+                bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
             else:
-                USER_DATA[message.from_user.id].status = 'заполнено'
-                bot.send_message(message.chat.id, 'Напишите свой вопрос')
-        elif USER_DATA[message.from_user.id].doctor == None:
+                USER_DATA[message.from_user.id].status = "заполнено"
+                bot.send_message(message.chat.id, "Напишите свой вопрос")
+        elif USER_DATA[message.from_user.id].doctor is None:
             USER_DATA[message.from_user.id].doctor = message.text
-            USER_DATA[message.from_user.id].status = 'заполнено'
-            bot.send_message(message.chat.id, 'Напишите свой вопрос')
+            USER_DATA[message.from_user.id].status = "заполнено"
+            bot.send_message(message.chat.id, "Напишите свой вопрос")
 
-
-    if text == 'оставить заявку':
+    if text == "оставить заявку":
         if message.from_user.id not in USER_DATA:
-            USER_DATA[message.from_user.id] = Ticket(message.from_user.id, message.chat.id)
-        USER_DATA[message.from_user.id].flag = True
-        if  USER_DATA[message.from_user.id].name == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите ФИО')
-        elif USER_DATA[message.from_user.id].email == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите свой email')
-        elif USER_DATA[message.from_user.id].diagnosis == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите свой диагноз или слово нет, при отсутствии')
-        elif USER_DATA[message.from_user.id].doctor == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите, кому адрессован вопрос')
+            USER_DATA[message.from_user.id] = {}
+        USER_DATA[message.from_user.id]['flag'] = True
+        if USER_DATA[message.from_user.id].get('name') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(message.chat.id, "Напишите ФИО")
+        elif USER_DATA[message.from_user.id].get('email') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(message.chat.id, "Напишите свой email")
+        elif USER_DATA[message.from_user.id].get('diagnosis') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(
+                message.chat.id, "Напишите свой диагноз или слово нет, при отсутствии"
+            )
+        elif USER_DATA[message.from_user.id].get('doctor') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
         else:
-            USER_DATA[message.from_user.id].status = 'заполнено'
-            bot.send_message(message.chat.id, 'Напишите свой вопрос')
+            USER_DATA[message.from_user.id]['status'] = "заполнено"
+            bot.send_message(message.chat.id, "Напишите свой вопрос")
 
     for button in main_menu_buttons:
         if text == button["title"].lower():
@@ -137,7 +163,9 @@ def handle_message(message: types.Message) -> None:
                     reply_markup=submenu,
                 )
             else:
-                bot.send_message(message.chat.id, "Соединяем вас с сотрудником Фонда...")
+                bot.send_message(
+                    message.chat.id, "Соединяем вас с сотрудником Фонда..."
+                )
             return
 
     if text in charity_answers:
@@ -150,33 +178,41 @@ def handle_message(message: types.Message) -> None:
                 bot.send_document(message.chat.id, pdf_file)
     elif text in to_make_tickets:
         if message.from_user.id not in USER_DATA:
-            USER_DATA[message.from_user.id] = Ticket(message.from_user.id, message.chat.id)
-        USER_DATA[message.from_user.id].flag = True
-        if USER_DATA[message.from_user.id].name == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите ФИО')
-        elif USER_DATA[message.from_user.id].email == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите свой email')
-        elif USER_DATA[message.from_user.id].diagnosis == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите свой диагноз или слово нет, при отсутствии')
-        elif USER_DATA[message.from_user.id].doctor == None:
-            USER_DATA[message.from_user.id].status = 'сбор данных'
-            bot.send_message(message.chat.id, 'Напишите, кому адрессован вопрос')
+            USER_DATA[message.from_user.id] = {}
+        USER_DATA[message.from_user.id]['flag'] = True
+        if USER_DATA[message.from_user.id].get('name') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(message.chat.id, "Напишите ФИО")
+        elif USER_DATA[message.from_user.id].get('email') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(message.chat.id, "Напишите свой email")
+        elif USER_DATA[message.from_user.id].get('diagnosis') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(
+                message.chat.id, "Напишите свой диагноз или слово нет, при отсутствии"
+            )
+        elif USER_DATA[message.from_user.id].get('doctor') is None:
+            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+            bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
         else:
-            USER_DATA[message.from_user.id].status = 'заполнено'
-            bot.send_message(message.chat.id, 'Напишите свой вопрос')
-        response = requests.post(f"{API_URL}/add_ticket", json={
-            "user_id": message.from_user.id,
-            "status": "new",
-            "request_subject": "New Ticket",
-            "request_body": text
-        })
+            USER_DATA[message.from_user.id]['status'] = "заполнено"
+            bot.send_message(message.chat.id, "Напишите свой вопрос")
+        response = requests.post(
+            f"{API_URL}/add_ticket",
+            json={
+                "user_id": message.from_user.id,
+                "status": "new",
+                "request_subject": "New Ticket",
+                "request_body": text,
+            },
+        )
         if response.json().get("status") == "success":
-            bot.send_message(message.chat.id, "Ваш запрос был зарегистрирован. Мы скоро с вами свяжемся.")
+            bot.send_message(
+                message.chat.id,
+                "Ваш запрос был зарегистрирован. Мы скоро с вами свяжемся.",
+            )
     else:
-        if USER_DATA[message.from_user.id].flag != True:
+        if not USER_DATA[message.from_user.id].get('flag', False):
             process_question(message)
 
 
@@ -199,10 +235,14 @@ def handle_ai_response(message: types.Message, ai_message: types.Message) -> Non
 
 def process_question(message: types.Message) -> None:
     loading_message = bot.send_message(message.chat.id, "Ищем ответ")
-    thread = threading.Thread(target=handle_ai_response, args=(message, loading_message))
+    thread = threading.Thread(
+        target=handle_ai_response, args=(message, loading_message)
+    )
     thread.start()
 
-    response = requests.post(f"{API_URL}/get_ai_response", json={"message": message.text})
+    response = requests.post(
+        f"{API_URL}/get_ai_response", json={"message": message.text}
+    )
     gpt_response = response.json().get("response")
 
     thread.join()

@@ -1,4 +1,3 @@
-import pandas as pd
 import streamlit as st
 
 
@@ -46,7 +45,6 @@ def apply_styles() -> None:
 
 # Функция для отображения данных в виде карточек
 def display_card(ticket) -> None:
-
     st.markdown(
         f"""
     <div class="card">
