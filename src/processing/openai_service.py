@@ -1,12 +1,12 @@
 from openai import OpenAI
-from src.config import OPENAI_API_KEY
 import time
+import os
+from dotenv import load_dotenv
 
-ASSISTANT_ID = "asst_LbBRPG5mUmBZeX47iY5gFH8p"
+load_dotenv()
+chats = {}  # TODO: change to DB
 
-chats = {}
-
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 def get_ai_response(message: str, chat_id: str):
@@ -19,7 +19,7 @@ def get_ai_response(message: str, chat_id: str):
     )
 
     run = client.beta.threads.runs.create(
-        thread_id=chats[chat_id], assistant_id=ASSISTANT_ID
+        thread_id=chats[chat_id], assistant_id=os.getenv("OPENAI_ASSISTANT_ID")
     )
 
     while run.status != "completed":
