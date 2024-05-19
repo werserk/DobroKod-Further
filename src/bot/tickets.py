@@ -1,21 +1,18 @@
-import openpyxl
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
+import os
+
+import pandas as pd
+
+DATA_PATH = "src/web/table.xlsx"
 
 
-def add_patient_record(
-    file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor
-):
-    try:
-        # Попробуем открыть существующую книгу
-        workbook = openpyxl.load_workbook(file_path)
-        sheet = workbook.active
-    except FileNotFoundError:
-        # Если файл не существует, создадим новую книгу
-        workbook = Workbook()
-        sheet = workbook.active
-        # Добавим заголовки столбцов
-        headers = [
+def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor):
+    # Проверим, существует ли файл
+    if os.path.exists(file_path):
+        # Загрузим существующие данные
+        df = pd.read_excel(file_path)
+    else:
+        # Создадим новый DataFrame с заголовками
+        df = pd.DataFrame(columns=[
             "Статус",
             "Диагноз",
             "Имя",
@@ -24,23 +21,25 @@ def add_patient_record(
             "user_id",
             "Заявка",
             "Врач",
-        ]
-        for col_num, header in enumerate(headers, 1):
-            col_letter = get_column_letter(col_num)
-            sheet[f"{col_letter}1"] = header
+        ])
 
-    # Определим следующую строку для записи данных
-    next_row = sheet.max_row + 1
+    # Создадим новую запись
+    new_record = {
+        "Статус": status,
+        "Диагноз": diagnosis,
+        "Имя": name,
+        "Почта": email,
+        "chat_id": chat_id,
+        "user_id": user_id,
+        "Заявка": request,
+        "Врач": doctor
+    }
 
-    # Запишем данные пациента
-    patient_data = [status, diagnosis, name, email, chat_id, user_id, request, doctor]
-    for col_num, data in enumerate(patient_data, 1):
-        col_letter = get_column_letter(col_num)
-        sheet[f"{col_letter}{next_row}"] = data
+    # Добавим новую запись в DataFrame
+    df = df.append(new_record, ignore_index=True)
 
-    # Сохраним изменения в файл
-    workbook.save(file_path)
-    # print(f"Запись для пациента {name} успешно добавлена в {file_path}")
+    # Сохраним DataFrame в Excel файл
+    df.to_excel(file_path, index=False)
 
 
 def make_ticket(chat_id, user_id):
