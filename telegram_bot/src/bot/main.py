@@ -1,33 +1,28 @@
+# telegram_bot/src/bot/main.py
 import json
 import os
 import threading
 import time
-from typing import List
 
+import requests
 import telebot
 from dotenv import load_dotenv
 from telebot import types
 
-from telegram_bot.src.tickets import make_ticket
-from backend.src.session import init_db
-from backend.src.utils import add_user
-from backend.src.openai_service import get_ai_response
-
 load_dotenv()
 
-init_db()
-
 bot = telebot.TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
+API_URL = "http://common_api:5000"
 
-# Загрузка данных из JSON
-with open("../data/buttons_data.json", "r", encoding="utf-8") as file:
+# Load data from JSON
+with open("./data/buttons_data.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 main_menu_buttons = data["main_menu_buttons"]
 charity_answers = data["charity_answers"]
 to_make_tickets = data["to_make_tickets"]
 
-# Главное меню
+# Main menu
 main_menu_keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
 buttons = [types.KeyboardButton(button["title"]) for button in main_menu_buttons]
 main_menu_keyboard.add(*buttons)
@@ -35,17 +30,16 @@ main_menu_keyboard.add(*buttons)
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message: types.Message) -> None:
-    bot.send_message(
-        message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
-    )
-    add_user(
-        chat_id=message.chat.id,
-        user_id=message.from_user.id,
-        name=message.from_user.first_name,
-    )
+    bot.send_message(message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard)
+    response = requests.post(f"{API_URL}/add_user", json={
+        "chat_id": message.chat.id,
+        "user_id": message.from_user.id,
+        "name": message.from_user.first_name
+    })
+    user_id = response.json().get("user_id")
 
 
-def generate_submenu(options: List[str]) -> types.ReplyKeyboardMarkup:
+def generate_submenu(options: list) -> types.ReplyKeyboardMarkup:
     submenu = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     buttons = [types.KeyboardButton(option) for option in options]
     buttons.append(types.KeyboardButton("Назад"))
@@ -58,9 +52,7 @@ def handle_message(message: types.Message) -> None:
     text = message.text.lower()
 
     if text == "назад":
-        bot.send_message(
-            message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
-        )
+        bot.send_message(message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard)
         return
 
     for button in main_menu_buttons:
@@ -73,9 +65,7 @@ def handle_message(message: types.Message) -> None:
                     reply_markup=submenu,
                 )
             else:
-                bot.send_message(
-                    message.chat.id, "Соединяем вас с сотрудником Фонда..."
-                )
+                bot.send_message(message.chat.id, "Соединяем вас с сотрудником Фонда...")
             return
 
     if text in charity_answers:
@@ -87,10 +77,14 @@ def handle_message(message: types.Message) -> None:
             with open(pdf_path, "rb") as pdf_file:
                 bot.send_document(message.chat.id, pdf_file)
     elif text in to_make_tickets:
-        make_ticket(message.chat.id, message.from_user.id)
-        bot.send_message(
-            message.chat.id, "Ваш запрос был зарегистрирован. Мы скоро с вами свяжемся."
-        )
+        response = requests.post(f"{API_URL}/add_ticket", json={
+            "user_id": message.from_user.id,
+            "status": "new",
+            "request_subject": "New Ticket",
+            "request_body": text
+        })
+        if response.json().get("status") == "success":
+            bot.send_message(message.chat.id, "Ваш запрос был зарегистрирован. Мы скоро с вами свяжемся.")
     else:
         process_question(message)
 
@@ -114,13 +108,11 @@ def handle_ai_response(message: types.Message, ai_message: types.Message) -> Non
 
 def process_question(message: types.Message) -> None:
     loading_message = bot.send_message(message.chat.id, "Ищем ответ")
-
-    thread = threading.Thread(
-        target=handle_ai_response, args=(message, loading_message)
-    )
+    thread = threading.Thread(target=handle_ai_response, args=(message, loading_message))
     thread.start()
 
-    gpt_response = get_ai_response(message)
+    response = requests.post(f"{API_URL}/get_ai_response", json={"message": message.text})
+    gpt_response = response.json().get("response")
 
     thread.join()
 

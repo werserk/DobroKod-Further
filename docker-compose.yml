@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  telegram_bot:
+    build:
+      context: .
+      dockerfile: telegram_bot/Dockerfile
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - common_api
+
+  web_app:
+    build:
+      context: .
+      dockerfile: web_app/Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - common_api
+
+  common_api:
+    build:
+      context: .
+      dockerfile: common_api/Dockerfile
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ASSISTANT_ID=${OPENAI_ASSISTANT_ID}
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+
+volumes:
+  postgres_data:

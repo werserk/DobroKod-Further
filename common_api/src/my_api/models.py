@@ -1,12 +1,11 @@
+# common_api/src/my_api/models.py
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-# Определение базового класса
 Base = declarative_base()
 
 
-# Определение модели таблиц
 class User(Base):
     __tablename__ = "users"
 

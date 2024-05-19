@@ -1,13 +1,10 @@
+# web_app/src/web/my_api.py
 import streamlit as st
 
-from data_loader import (
-    load_data,
-    update_data,
-    filter_by_email,
-    filter_by_doctor,
-    filter_by_status,
-)
+from data_loader import load_data, update_data, filter_by_email, filter_by_doctor, filter_by_status
 from style_display import apply_styles, display_card
+
+API_URL = "http://common_api:5000"
 
 
 def main():
@@ -34,7 +31,7 @@ def main():
             display_card(row)
 
     # Обработчик события для изменения статуса
-    query_params = st.query_params
+    query_params = st.experimental_get_query_params()
     if "change_status" in query_params:
         key = int(query_params["change_status"][0])
         person = df.loc[key]

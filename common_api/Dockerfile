@@ -1,13 +1,14 @@
-# web_app/Dockerfile
 FROM python:3.12
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 WORKDIR /app
 
-COPY web_app/src/web /app/web
-COPY common_api/src/my_api /app/common_api
+# Устанавливаем Poetry
+RUN pip install --no-cache-dir poetry
+
+# Копируем файлы проекта
+COPY common_api/src/my_api /app/my_api
 COPY common_api/src/processing /app/processing
-COPY ./data /app/data
 COPY pyproject.toml poetry.lock /app/
 
 RUN apt-get update && \
@@ -16,4 +17,5 @@ RUN apt-get update && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev
 
-CMD ["streamlit", "run", "web/app.py"]
+# Указываем команду по умолчанию для запуска контейнера
+CMD ["python", "my_api/main.py"]

@@ -1,12 +1,16 @@
+# web_app/src/web/data_loader.py
 import pandas as pd
+import requests
 import streamlit as st
 
-DATA_PATH = "./data/table.xlsx"
+API_URL = "http://common_api:5000"
 
 
-@st.cache_resource
+@st.cache_data
 def load_data() -> pd.DataFrame:
-    return pd.read_excel(DATA_PATH)
+    response = requests.get(f"{API_URL}/get_all_tickets")
+    data = response.json()
+    return pd.DataFrame(data)
 
 
 def filter_by_email(df: pd.DataFrame, search_query: str) -> pd.DataFrame:
@@ -28,4 +32,5 @@ def filter_by_doctor(df: pd.DataFrame, doctor_filter: str) -> pd.DataFrame:
 
 
 def update_data(df: pd.DataFrame) -> None:
-    df.to_excel(DATA_PATH, index=False)
+    # Update data through API
+    pass

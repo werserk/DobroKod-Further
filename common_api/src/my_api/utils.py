@@ -1,7 +1,7 @@
 from typing import Optional
 
-from backend.src.models import User, Ticket
-from .session import SessionLocal
+from common_api.src.my_api.models import User, Ticket
+from session import SessionLocal
 
 
 def add_user(
