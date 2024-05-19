@@ -8,6 +8,10 @@ docker-compose up --build
 
 ссылка на бота tg: https://t.me/dalshefond_support_bot
 
+ссылка на папку ``data`` (обязательна для скачивания)
+
+credentials заполняются в `.env`
+
 ## Additional materials
 
 - [Presentation](https://docs.google.com/presentation/d/1BcdFLT8iI9ciLSWO5948rsZ-FlPaijCCQg2Iu0VgUCg/edit?usp=sharing)
