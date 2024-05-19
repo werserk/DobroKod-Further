@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from telebot import types
 
-from src.database.utils import get_user_by_chat_id, add_user, update_user_thread_id
+from backend.src.utils import get_user_by_chat_id, add_user, update_user_thread_id
 
 load_dotenv()
 

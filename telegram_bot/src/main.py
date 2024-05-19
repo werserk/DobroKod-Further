@@ -8,10 +8,10 @@ import telebot
 from dotenv import load_dotenv
 from telebot import types
 
-from src.bot.tickets import make_ticket
-from src.database.session import init_db
-from src.database.utils import add_user
-from src.processing.openai_service import get_ai_response
+from telegram_bot.src.tickets import make_ticket
+from backend.src.session import init_db
+from backend.src.utils import add_user
+from backend.src.openai_service import get_ai_response
 
 load_dotenv()
 

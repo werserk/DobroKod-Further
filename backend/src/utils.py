@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .models import User, Ticket
+from backend.src.models import User, Ticket
 from .session import SessionLocal
 
 
