@@ -31,7 +31,7 @@ def main():
     cols = st.columns(3)
     for idx, row in filtered_df.iterrows():
         with cols[idx % 3]:
-            display_card(row, key=idx)
+            display_card(row)
 
     # Обработчик события для изменения статуса
     query_params = st.query_params
