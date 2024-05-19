@@ -34,15 +34,15 @@ def send_welcome(message: types.Message) -> None:
     bot.send_message(
         message.chat.id, "Что вас интересует?", reply_markup=main_menu_keyboard
     )
-    response = requests.post(
-        f"{API_URL}/add_user",
-        json={
-            "chat_id": message.chat.id,
-            "user_id": message.from_user.id,
-            "name": message.from_user.first_name,
-        },
-    )
-    user_id = response.json().get("user_id")
+    # response = requests.post(
+    #     f"{API_URL}/add_user",
+    #     json={
+    #         "chat_id": message.chat.id,
+    #         "user_id": message.from_user.id,
+    #         "name": message.from_user.first_name,
+    #     },
+    # )
+    # print(response.json())
 
 
 def generate_submenu(options: list) -> types.ReplyKeyboardMarkup:
@@ -134,23 +134,23 @@ def handle_message(message: types.Message) -> None:
     if text == "оставить заявку":
         if message.from_user.id not in USER_DATA:
             USER_DATA[message.from_user.id] = {}
-        USER_DATA[message.from_user.id]['flag'] = True
-        if USER_DATA[message.from_user.id].get('name') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        USER_DATA[message.from_user.id]["flag"] = True
+        if USER_DATA[message.from_user.id].get("name") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(message.chat.id, "Напишите ФИО")
-        elif USER_DATA[message.from_user.id].get('email') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        elif USER_DATA[message.from_user.id].get("email") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(message.chat.id, "Напишите свой email")
-        elif USER_DATA[message.from_user.id].get('diagnosis') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        elif USER_DATA[message.from_user.id].get("diagnosis") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(
                 message.chat.id, "Напишите свой диагноз или слово нет, при отсутствии"
             )
-        elif USER_DATA[message.from_user.id].get('doctor') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        elif USER_DATA[message.from_user.id].get("doctor") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
         else:
-            USER_DATA[message.from_user.id]['status'] = "заполнено"
+            USER_DATA[message.from_user.id]["status"] = "заполнено"
             bot.send_message(message.chat.id, "Напишите свой вопрос")
 
     for button in main_menu_buttons:
@@ -179,23 +179,23 @@ def handle_message(message: types.Message) -> None:
     elif text in to_make_tickets:
         if message.from_user.id not in USER_DATA:
             USER_DATA[message.from_user.id] = {}
-        USER_DATA[message.from_user.id]['flag'] = True
-        if USER_DATA[message.from_user.id].get('name') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        USER_DATA[message.from_user.id]["flag"] = True
+        if USER_DATA[message.from_user.id].get("name") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(message.chat.id, "Напишите ФИО")
-        elif USER_DATA[message.from_user.id].get('email') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        elif USER_DATA[message.from_user.id].get("email") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(message.chat.id, "Напишите свой email")
-        elif USER_DATA[message.from_user.id].get('diagnosis') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        elif USER_DATA[message.from_user.id].get("diagnosis") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(
                 message.chat.id, "Напишите свой диагноз или слово нет, при отсутствии"
             )
-        elif USER_DATA[message.from_user.id].get('doctor') is None:
-            USER_DATA[message.from_user.id]['status'] = "сбор данных"
+        elif USER_DATA[message.from_user.id].get("doctor") is None:
+            USER_DATA[message.from_user.id]["status"] = "сбор данных"
             bot.send_message(message.chat.id, "Напишите, кому адресован вопрос")
         else:
-            USER_DATA[message.from_user.id]['status'] = "заполнено"
+            USER_DATA[message.from_user.id]["status"] = "заполнено"
             bot.send_message(message.chat.id, "Напишите свой вопрос")
         response = requests.post(
             f"{API_URL}/add_ticket",
@@ -212,7 +212,7 @@ def handle_message(message: types.Message) -> None:
                 "Ваш запрос был зарегистрирован. Мы скоро с вами свяжемся.",
             )
     else:
-        if not USER_DATA[message.from_user.id].get('flag', False):
+        if not USER_DATA[message.from_user.id].get("flag", False):
             process_question(message)
 
 

@@ -3,8 +3,20 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from models import Base
-from utils import add_user, add_ticket, update_ticket_status, get_ticket_by_id, get_all_tickets, get_user_by_id, \
-    get_user_by_chat_id, get_user_by_email, get_user_by_name, update_user_thread_id
+from openai_service import get_ai_response
+from utils import (
+    add_user,
+    add_ticket,
+    update_ticket_status,
+    get_ticket_by_id,
+    get_all_tickets,
+    get_user_by_id,
+    get_user_by_chat_id,
+    get_user_by_email,
+    get_user_by_name,
+    update_user_thread_id,
+    get_all_users,
+)
 
 app = Flask(__name__)
 
@@ -17,8 +29,14 @@ Base.metadata.create_all(bind=engine)
 @app.route("/add_user", methods=["POST"])
 def add_user_route():
     data = request.json
-    user = add_user(data["chat_id"], data["user_id"], data.get("thread_id"), data.get("email"), data.get("name"),
-                    data.get("surname"))
+    user = add_user(
+        data["chat_id"],
+        data["user_id"],
+        data.get("thread_id"),
+        data.get("email"),
+        data.get("name"),
+        data.get("surname"),
+    )
     return jsonify(user)
 
 
@@ -49,15 +67,21 @@ def get_user_by_name_route(name):
 @app.route("/update_user_thread_id/<int:user_id>", methods=["PUT"])
 def update_user_thread_id_route(user_id):
     data = request.json
-    update_user_thread_id(user_id, data['thread_id'])
+    update_user_thread_id(user_id, data["thread_id"])
     return jsonify({"status": "success"})
 
 
 @app.route("/add_ticket", methods=["POST"])
 def add_ticket_route():
     data = request.json
-    add_ticket(data["user_id"], data["diagnosis"], data["doctor"], data["status"], data["request_subject"],
-               data["request_body"])
+    add_ticket(
+        data["user_id"],
+        data["diagnosis"],
+        data["doctor"],
+        data["status"],
+        data["request_subject"],
+        data["request_body"],
+    )
     return jsonify({"status": "success"})
 
 
