@@ -1,4 +1,13 @@
+## Run
+Telegram bot:
+```bash
+python3 src/bot/main.py
+```
 
+Web:
+```bash
+streamlit run src/web/app.py
+```
 
 ## Additional materials
 - [Presentation](https://docs.google.com/presentation/d/1BcdFLT8iI9ciLSWO5948rsZ-FlPaijCCQg2Iu0VgUCg/edit?usp=sharing)

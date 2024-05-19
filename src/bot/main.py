@@ -16,7 +16,7 @@ load_dotenv()
 bot = telebot.TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
 
 # Загрузка данных из JSON
-with open("../../data/buttons_data.json", "r", encoding="utf-8") as file:
+with open("../data/buttons_data.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 main_menu_buttons = data["main_menu_buttons"]

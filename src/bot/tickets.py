@@ -6,15 +6,15 @@ DATA_PATH = "src/web/table.xlsx"
 
 
 def add_patient_record(
-        file_path: str,
-        status: str,
-        diagnosis: str,
-        name: str,
-        email: str,
-        chat_id: int,
-        user_id: int,
-        request: str,
-        doctor: str,
+    file_path: str,
+    status: str,
+    diagnosis: str,
+    name: str,
+    email: str,
+    chat_id: int,
+    user_id: int,
+    request: str,
+    doctor: str,
 ):
     # Проверим, существует ли файл
     if os.path.exists(file_path):
