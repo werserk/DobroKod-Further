@@ -20,12 +20,12 @@ def main():
     search_query = st.sidebar.text_input("Поиск по диагнозу:")
     status_filter = st.sidebar.selectbox("Статус:", ["Все", "активный", "неактивный"])
 
-    doctor_filter = st.sidebar.selectbox("Специалист:", ["Все"] + doctor_list())
+    # doctor_filter = st.sidebar.selectbox("Специалист:", ["Все"] + doctor_list())
 
     # Фильтрация данных
     filtered_df = filter_by_diagnosis(tickets, search_query)
     filtered_df = filter_by_status(filtered_df, status_filter)
-    filtered_df = filter_by_doctor(filtered_df, doctor_filter)
+    # filtered_df = filter_by_doctor(filtered_df, doctor_filter)
 
     # Вывод данных
     st.markdown("<h1 style='text-align: center;'>Тикеты</h1>", unsafe_allow_html=True)
