@@ -3,7 +3,9 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
 
-def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor):
+def add_patient_record(
+    file_path, status, diagnosis, name, email, chat_id, user_id, request, doctor
+):
     try:
         # Попробуем открыть существующую книгу
         workbook = openpyxl.load_workbook(file_path)
@@ -13,7 +15,16 @@ def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_
         workbook = Workbook()
         sheet = workbook.active
         # Добавим заголовки столбцов
-        headers = ["Статус", "Диагноз", "Имя", "Почта", "chat_id", "user_id",  "Заявка", "Врач"]
+        headers = [
+            "Статус",
+            "Диагноз",
+            "Имя",
+            "Почта",
+            "chat_id",
+            "user_id",
+            "Заявка",
+            "Врач",
+        ]
         for col_num, header in enumerate(headers, 1):
             col_letter = get_column_letter(col_num)
             sheet[f"{col_letter}1"] = header
@@ -29,12 +40,20 @@ def add_patient_record(file_path, status, diagnosis, name, email, chat_id, user_
 
     # Сохраним изменения в файл
     workbook.save(file_path)
-    #print(f"Запись для пациента {name} успешно добавлена в {file_path}")
+    # print(f"Запись для пациента {name} успешно добавлена в {file_path}")
 
 
-TO_MAKE_TICKETS = ['вопрос онкологу','вопрос лимфологу', 'вопрос эндокринологу', 'вопрос диетологу',
-     'вопрос дерматологу', 'хочу поделиться своим опытом', 'хочу оставить отзыв',
-     'помочь по-другому']
+TO_MAKE_TICKETS = [
+    "вопрос онкологу",
+    "вопрос лимфологу",
+    "вопрос эндокринологу",
+    "вопрос диетологу",
+    "вопрос дерматологу",
+    "хочу поделиться своим опытом",
+    "хочу оставить отзыв",
+    "помочь по-другому",
+]
+
 
 def make_ticket(chat_id, user_id):
     pass
