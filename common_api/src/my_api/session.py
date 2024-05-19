@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from common_api.src.my_api.models import Base
+from models import Base
 
 SQLALCHEMY_DATABASE_URI = "sqlite:///tickets_lib.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URI)

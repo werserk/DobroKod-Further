@@ -1,6 +1,6 @@
 from typing import Optional
 
-from common_api.src.my_api.models import User, Ticket
+from models import User, Ticket
 from session import SessionLocal
 
 

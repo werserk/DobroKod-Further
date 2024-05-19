@@ -1,9 +1,9 @@
 # common_api/src/my_api/main.py
 from flask import Flask, request, jsonify
+from processing.openai_service import get_ai_response
 
 from session import init_db
 from utils import add_user, add_ticket, get_user_by_id, get_ticket_by_id
-from ..processing.openai_service import get_ai_response
 
 init_db()
 
